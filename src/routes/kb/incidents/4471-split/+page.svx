@@ -1,0 +1,52 @@
+---
+layout: runbook
+title: '#4471 split · parser and booking-v3 date problems'
+owner: support desk
+status: accepted
+reviewed: 2026-11-01
+signature: v1.eyJzdWIiOiI1OTYyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM1NTM0OTYsImV4cCI6MTc5MzYzOTg5Nn0.-JBKHDEWukyYyE12VXUR1JD7AUZyaIUoqyI3avdcFbk
+---
+
+<script>
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import QueueTimeline from '#lib/kb/QueueTimeline.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+Ticket #4471 merged 412 reports across all channels under the assumption of a single parser defect.
+Detailed triage against tenant configurations and form versions shows two distinct root problems.
+
+<Callout>
+Ticket #4471 is now split into two separate issues by underlying cause.
+</Callout>
+
+## Problems Identified
+
+### 1. Date Parser (`parser`) · 379 reports
+The shared date parser reads dates month-first (`MM/DD`), while tenants in day-first locales write day-first (`DD/MM`).
+- **Reports covered:** 379 reports.
+- **Channels:** `app`, `email`, and `form`.
+- **Tenants:** 11 tenants in day-first locales (`de-DE`, `es-ES`, `en-GB`, `nl-NL`, `cs-CZ`, `it-IT`, `fr-FR`, `pl-PL`, `pt-PT`, `da-DK`, `en-IE`).
+- **Desk note:** 5 reports were initially read as one-day moves, but belong to this cause.
+
+### 2. Booking-v3 Date Hint (`hint`) · 33 reports
+Tenants using the `booking-v3` form display an `MM/DD/YYYY` placeholder hint. Users in day-first locales enter dates month-first following the hint, but the form interprets their input using the tenant's day-first locale (`DD/MM/YYYY`).
+- **Reports covered:** 33 reports.
+- **Channels:** `form` only.
+- **Tenants:** 3 tenants running `booking-v3` in day-first locales (`alder.physio`, `copper.studio`, `pale.harbour`).
+
+## What was merged
+
+<CauseTable ticket={4471} />
+
+## Since April
+
+<QueueTimeline ticket={4471} />
+
+## Filed Tickets
+
+1. **Issue #1:** `parser · dates parse mm/dd in day-first locales` (covers 379 reports)
+2. **Issue #2:** `hint · date hint mm/dd/yyyy shown on booking-v3 in day-first locales` (covers 33 reports)
+
+<RenderStamp {signature} />
